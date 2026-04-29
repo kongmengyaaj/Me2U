@@ -1,0 +1,417 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Me2U — Place Your Order</title>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet"/>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --bg:#eef4ee; --bg2:#e4ede4; --white:#f8fbf8;
+      --magenta:#d4529a; --mag-dk:#b8357e; --mag-lt:#f5d6ea;
+      --green:#4a7c59; --green-lt:#c8dfc8;
+      --brown:#1a2a1a; --mid:#4a5e4a; --light:#8fa88f; --border:#ccdacc;
+    }
+    html { scroll-behavior: smooth; }
+    body { background: var(--bg); color: var(--brown); font-family: 'Inter', sans-serif; min-height: 100vh; }
+
+    /* TOP BAR */
+    .topbar {
+      position: sticky; top: 0; z-index: 100;
+      background: rgba(238,244,238,0.96); backdrop-filter: blur(14px);
+      border-bottom: 1px solid var(--border);
+      padding: 14px 48px;
+      display: flex; align-items: center; gap: 20px;
+    }
+    .home-btn {
+      display: inline-flex; align-items: center; gap: 8px;
+      text-decoration: none; color: var(--mid);
+      font-size: 13px; font-weight: 600;
+      background: var(--white); border: 1.5px solid var(--border);
+      padding: 8px 18px; border-radius: 999px;
+      transition: border-color .2s, color .2s;
+    }
+    .home-btn:hover { border-color: var(--magenta); color: var(--magenta); }
+    .home-btn svg { width: 15px; height: 15px; }
+    .topbar-logo { font-family: 'Playfair Display', serif; font-size: 20px; color: var(--brown); text-decoration: none; margin-left: auto; }
+    .topbar-logo span { color: var(--magenta); }
+
+    /* HERO STRIP */
+    .order-hero {
+      background: linear-gradient(135deg, #d4e8d4 0%, #e8d4e8 100%);
+      padding: 56px 48px 48px;
+      text-align: center;
+      border-bottom: 1px solid var(--border);
+    }
+    .order-hero h1 {
+      font-family: 'Playfair Display', serif;
+      font-size: clamp(32px, 4vw, 52px);
+      font-weight: 700; color: var(--brown); margin-bottom: 10px;
+    }
+    .order-hero h1 em { font-style: italic; color: var(--magenta); }
+    .order-hero p { font-size: 15px; color: var(--mid); }
+
+    /* FORM WRAPPER */
+    .form-wrap {
+      max-width: 620px; margin: 0 auto;
+      padding: 56px 24px 80px;
+    }
+
+    /* SECTION CARD */
+    .form-card {
+      background: var(--white); border: 1.5px solid var(--border);
+      border-radius: 20px; padding: 36px 32px; margin-bottom: 24px;
+    }
+
+    .card-header {
+      display: flex; align-items: center; gap: 12px; margin-bottom: 28px;
+    }
+    .card-icon {
+      width: 44px; height: 44px; border-radius: 12px;
+      background: var(--mag-lt); display: flex; align-items: center; justify-content: center;
+      font-size: 22px; flex-shrink: 0;
+    }
+    .card-header h2 {
+      font-family: 'Playfair Display', serif;
+      font-size: 20px; font-weight: 700; color: var(--brown);
+    }
+    .card-header p { font-size: 13px; color: var(--light); margin-top: 2px; }
+
+    /* BOUQUET SELECTOR */
+    .bouquet-grid { display: grid; grid-template-columns: repeat(3,1fr); gap: 12px; }
+    .bopt input { display: none; }
+    .bopt label {
+      display: flex; flex-direction: column; align-items: center; gap: 7px;
+      padding: 20px 10px; background: var(--bg);
+      border: 2px solid var(--border); border-radius: 14px;
+      cursor: pointer; text-align: center;
+      transition: border-color .2s, background .2s;
+    }
+    .bopt label:hover { border-color: var(--mag-lt); }
+    .bopt input:checked + label { border-color: var(--magenta); background: #fdf0f7; }
+    .b-em { font-size: 34px; }
+    .b-nm { font-size: 13px; font-weight: 600; }
+    .b-pr { font-size: 13px; font-weight: 700; color: var(--magenta); }
+
+    /* FIELDS */
+    .fg { margin-bottom: 18px; }
+    .frow { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+
+    label.fl {
+      display: block; font-size: 11px; font-weight: 700;
+      letter-spacing: 0.12em; text-transform: uppercase;
+      color: var(--mid); margin-bottom: 7px;
+    }
+
+    input[type=text], input[type=email], input[type=tel],
+    input[type=date], input[type=number], textarea, select {
+      width: 100%; padding: 13px 16px;
+      background: var(--bg); border: 2px solid var(--border);
+      border-radius: 10px; font-family: 'Inter', sans-serif;
+      font-size: 15px; color: var(--brown); outline: none;
+      transition: border-color .2s; appearance: none;
+    }
+    input:focus, textarea:focus, select:focus { border-color: var(--magenta); }
+    input::placeholder, textarea::placeholder { color: var(--light); }
+    textarea { resize: vertical; min-height: 120px; }
+
+    .select-wrap { position: relative; }
+    .select-wrap::after {
+      content: '▾'; position: absolute; right: 16px; top: 50%;
+      transform: translateY(-50%); pointer-events: none;
+      color: var(--mid); font-size: 13px;
+    }
+
+    /* CARD INPUT STYLING */
+    .card-row { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+    .card-number-wrap { position: relative; }
+    .card-number-wrap input { padding-right: 56px; }
+    .card-icons {
+      position: absolute; right: 14px; top: 50%; transform: translateY(-50%);
+      display: flex; gap: 4px; align-items: center;
+    }
+    .card-icons span {
+      font-size: 18px; opacity: 0.55;
+    }
+
+    /* SUMMARY */
+    .summary-card {
+      background: linear-gradient(135deg, #d4e8d4, #e8d4e8);
+      border: 1.5px solid var(--border); border-radius: 20px;
+      padding: 28px 32px; margin-bottom: 24px;
+    }
+    .summary-card h3 {
+      font-family: 'Playfair Display', serif;
+      font-size: 17px; font-weight: 700; margin-bottom: 18px; color: var(--brown);
+    }
+    .sr { display: flex; justify-content: space-between; font-size: 14px; color: var(--mid); padding: 5px 0; }
+    .sr.total {
+      border-top: 1.5px solid rgba(0,0,0,0.1); margin-top: 10px; padding-top: 14px;
+      font-size: 18px; font-weight: 700; color: var(--brown);
+    }
+
+    /* SUBMIT */
+    .submit-btn {
+      width: 100%; padding: 18px;
+      background: var(--magenta); color: #fff;
+      border: none; border-radius: 999px;
+      font-family: 'Inter', sans-serif; font-size: 16px; font-weight: 700;
+      cursor: pointer; transition: background .2s, transform .15s;
+      display: flex; align-items: center; justify-content: center; gap: 10px;
+      box-shadow: 0 8px 28px rgba(192,38,122,0.35);
+    }
+    .submit-btn:hover { background: var(--mag-dk); transform: translateY(-1px); }
+
+    .form-note {
+      text-align: center; font-size: 12px; color: var(--light);
+      margin-top: 14px; display: flex; align-items: center; justify-content: center; gap: 6px;
+    }
+
+    /* SUCCESS */
+    .success-wrap {
+      display: none; text-align: center; padding: 80px 32px;
+      max-width: 500px; margin: 0 auto;
+    }
+    .success-wrap.show { display: block; }
+    .success-wrap .big { font-size: 80px; margin-bottom: 24px; }
+    .success-wrap h2 { font-family: 'Playfair Display', serif; font-size: 34px; font-weight: 700; margin-bottom: 14px; }
+    .success-wrap p { font-size: 16px; color: var(--mid); line-height: 1.7; margin-bottom: 28px; }
+    .success-wrap a {
+      display: inline-flex; align-items: center; gap: 8px;
+      background: var(--magenta); color: #fff; text-decoration: none;
+      padding: 14px 32px; border-radius: 999px; font-size: 14px; font-weight: 700;
+      transition: background .2s;
+    }
+    .success-wrap a:hover { background: var(--mag-dk); }
+
+    footer {
+      background: var(--brown); color: rgba(255,255,255,0.36);
+      padding: 32px 72px; display: flex; justify-content: space-between; align-items: center;
+    }
+    .fl-logo { font-family: 'Playfair Display', serif; font-size: 18px; color: #fff; }
+    .fl-copy { font-size: 12px; }
+
+    @media (max-width: 640px) {
+      .topbar { padding: 12px 18px; }
+      .order-hero { padding: 48px 24px 36px; }
+      .form-card { padding: 28px 20px; }
+      .frow, .card-row, .bouquet-grid { grid-template-columns: 1fr; }
+      footer { padding: 28px 20px; flex-direction: column; gap: 10px; text-align: center; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- TOP BAR -->
+<div class="topbar">
+  <a class="home-btn" href="index.html">
+    <svg viewBox="0 0 15 15" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M1.5 6.5L7.5 1.5L13.5 6.5V13H9.5V9.5H5.5V13H1.5V6.5Z"/>
+    </svg>
+    Home
+  </a>
+  <a class="topbar-logo" href="index.html">Me<span>2U</span></a>
+</div>
+
+<!-- HERO STRIP -->
+<div class="order-hero">
+  <h1>Send something <em>beautiful.</em></h1>
+  <p>Fill out the form below and we'll take care of the rest 🌸</p>
+</div>
+
+<div class="form-wrap" id="formWrap">
+
+
+
+  <!-- YOUR DETAILS -->
+  <div class="form-card">
+    <div class="card-header">
+      <div class="card-icon">👤</div>
+      <div>
+        <h2>Your details</h2>
+        <p>Who's sending the flowers?</p>
+      </div>
+    </div>
+    <div class="frow fg">
+      <div>
+        <label class="fl" for="senderName">Your name</label>
+        <input type="text" id="senderName" placeholder="Your full name"/>
+      </div>
+      <div>
+        <label class="fl" for="senderPhone">Your phone</label>
+        <input type="tel" id="senderPhone" placeholder="(555) 000-0000"/>
+      </div>
+    </div>
+  </div>
+
+  <!-- RECIPIENT -->
+  <div class="form-card">
+    <div class="card-header">
+      <div class="card-icon">📍</div>
+      <div>
+        <h2>Recipient details</h2>
+        <p>Who's receiving the flowers?</p>
+      </div>
+    </div>
+    <div class="frow fg">
+      <div>
+        <label class="fl" for="recipientName">Their name</label>
+        <input type="text" id="recipientName" placeholder="Their full name"/>
+      </div>
+      <div>
+        <label class="fl" for="recipientPhone">Their phone</label>
+        <input type="tel" id="recipientPhone" placeholder="(555) 000-0000"/>
+      </div>
+    </div>
+    <div class="fg">
+      <label class="fl" for="recipientAddress">Delivery address</label>
+      <input type="text" id="recipientAddress" placeholder="Street, city, state, zip"/>
+    </div>
+  </div>
+
+  <!-- DATE & TIME -->
+  <div class="form-card">
+    <div class="card-header">
+      <div class="card-icon">📅</div>
+      <div>
+        <h2>Delivery date & time</h2>
+        <p>When should we deliver?</p>
+      </div>
+    </div>
+    <div class="frow fg">
+      <div>
+        <label class="fl" for="deliveryDate">Date</label>
+        <input type="date" id="deliveryDate"/>
+      </div>
+      <div>
+        <label class="fl" for="deliveryTime">Preferred time</label>
+        <div class="select-wrap">
+          <select id="deliveryTime">
+            <option value="">Select a time window</option>
+            <option>Morning (9am – 12pm)</option>
+            <option>Afternoon (12pm – 4pm)</option>
+            <option>Evening (4pm – 8pm)</option>
+          </select>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- CARD MESSAGE -->
+  <div class="form-card">
+    <div class="card-header">
+      <div class="card-icon">💌</div>
+      <div>
+        <h2>Your card message</h2>
+        <p>We'll print this and tuck it in with the flowers</p>
+      </div>
+    </div>
+    <div class="fg">
+      <label class="fl" for="cardMessage">What would you like to say?</label>
+      <textarea id="cardMessage" placeholder="Write something from the heart…"></textarea>
+    </div>
+  </div>
+
+  <!-- PAYMENT -->
+  <div class="form-card">
+    <div class="card-header">
+      <div class="card-icon">💳</div>
+      <div>
+        <h2>Payment</h2>
+        <p>Your card will be charged once you place the order</p>
+      </div>
+    </div>
+    <div class="fg">
+      <label class="fl" for="cardName">Name on card</label>
+      <input type="text" id="cardName" placeholder="Full name"/>
+    </div>
+    <div class="fg">
+      <label class="fl" for="cardNumber">Card number</label>
+      <div class="card-number-wrap">
+        <input type="text" id="cardNumber" placeholder="1234 5678 9012 3456" maxlength="19" oninput="formatCard(this)"/>
+        <div class="card-icons">
+          <span>💳</span>
+        </div>
+      </div>
+    </div>
+    <div class="card-row fg">
+      <div>
+        <label class="fl" for="cardExpiry">Expiry</label>
+        <input type="text" id="cardExpiry" placeholder="MM / YY" maxlength="7" oninput="formatExpiry(this)"/>
+      </div>
+      <div>
+        <label class="fl" for="cardCvc">CVC</label>
+        <input type="number" id="cardCvc" placeholder="123" maxlength="4"/>
+      </div>
+    </div>
+  </div>
+
+  <div class="summary-card">
+    <h3>Order summary</h3>
+    <div class="sr"><span>Fresh flower bouquet</span><span>included</span></div>
+    <div class="sr"><span>Custom printed card</span><span>included</span></div>
+    <div class="sr"><span>Delivery</span><span>included</span></div>
+    <div class="sr total"><span>Total charged today</span><span>$55</span></div>
+  </div>
+
+  <button class="submit-btn" onclick="submitOrder()">
+    💐 Place my order & pay
+  </button>
+  <p class="form-note">🔒 Your payment info is secure and encrypted</p>
+
+</div>
+
+<!-- SUCCESS -->
+<div class="success-wrap" id="successWrap">
+  <div class="big">🌸</div>
+  <h2>Order placed!</h2>
+  <p>We're already getting everything ready. Your flowers will be delivered with love right to their door.</p>
+  <a href="index.html">← Back to home</a>
+</div>
+
+
+
+<script>
+  // Set min date to today
+  const today = new Date().toISOString().split('T')[0];
+  document.getElementById('deliveryDate').min = today;
+  document.getElementById('deliveryDate').value = today;
+
+  // Card number formatter
+  function formatCard(el) {
+    let v = el.value.replace(/\D/g,'').substring(0,16);
+    el.value = v.replace(/(.{4})/g,'$1 ').trim();
+  }
+
+  // Expiry formatter
+  function formatExpiry(el) {
+    let v = el.value.replace(/\D/g,'').substring(0,4);
+    if (v.length >= 3) v = v.substring(0,2) + ' / ' + v.substring(2);
+    el.value = v;
+  }
+
+  // Submit
+  function submitOrder() {
+    const required = [
+      'senderName','senderPhone',
+      'recipientName','recipientAddress',
+      'deliveryDate','deliveryTime',
+      'cardMessage',
+      'cardName','cardNumber','cardExpiry','cardCvc'
+    ];
+    const missing = required.find(id => !document.getElementById(id).value.trim());
+    if (missing) {
+      const el = document.getElementById(missing);
+      el.focus();
+      el.style.borderColor = '#c0267a';
+      setTimeout(() => el.style.borderColor = '', 2000);
+      return;
+    }
+    document.getElementById('formWrap').style.display = 'none';
+    document.getElementById('successWrap').classList.add('show');
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+</script>
+</body>
+</html>
