@@ -21,16 +21,15 @@
       position: fixed; top: 0; left: 0; right: 0; z-index: 300;
       display: flex; justify-content: space-between; align-items: center;
       padding: 22px 56px;
-      transition: background .4s, box-shadow .4s;
+      background: #e8f0e8;
+      border-bottom: 1px solid var(--border);
+      transition: box-shadow .4s;
     }
     nav.scrolled {
-      background: rgba(222,234,222,0.97);
-      backdrop-filter: blur(16px);
-      box-shadow: 0 1px 0 var(--border);
+      box-shadow: 0 2px 12px rgba(60,80,40,0.08);
     }
     .logo-img { text-decoration: none; display:flex; align-items:center; }
-    .logo-img img { filter: brightness(0) invert(1); transition: filter .3s; }
-    nav.scrolled .logo-img img { filter: none; }
+    .logo-img img { filter: none; }
     .nav-btn {
       background: var(--mag); color: #fff; text-decoration: none;
       padding: 11px 30px; font-family: 'Jost', sans-serif;

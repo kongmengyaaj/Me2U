@@ -16,10 +16,10 @@
     html { scroll-behavior: smooth; }
     body { background: var(--bg); color: var(--brown); font-family: 'Inter', sans-serif; min-height: 100vh; }
 
-    /* TOP BAR */
+  /* TOP BAR */
     .topbar {
       position: sticky; top: 0; z-index: 100;
-      background: rgba(238,244,238,0.96); backdrop-filter: blur(14px);
+      background: #e8f0e8;
       border-bottom: 1px solid var(--border);
       padding: 14px 48px;
       display: flex; align-items: center; gap: 20px;
@@ -125,15 +125,7 @@
 
     /* CARD INPUT STYLING */
     .card-row { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
-    .card-number-wrap { position: relative; }
-    .card-number-wrap input { padding-right: 56px; }
-    .card-icons {
-      position: absolute; right: 14px; top: 50%; transform: translateY(-50%);
-      display: flex; gap: 4px; align-items: center;
-    }
-    .card-icons span {
-      font-size: 18px; opacity: 0.55;
-    }
+
 
     /* SUMMARY */
     .summary-card {
@@ -313,39 +305,7 @@
     </div>
   </div>
 
-  <!-- PAYMENT -->
-  <div class="form-card">
-    <div class="card-header">
-      <div class="card-icon">💳</div>
-      <div>
-        <h2>Payment</h2>
-        <p>Your card will be charged once you place the order</p>
-      </div>
-    </div>
-    <div class="fg">
-      <label class="fl" for="cardName">Name on card</label>
-      <input type="text" id="cardName" placeholder="Full name"/>
-    </div>
-    <div class="fg">
-      <label class="fl" for="cardNumber">Card number</label>
-      <div class="card-number-wrap">
-        <input type="text" id="cardNumber" placeholder="1234 5678 9012 3456" maxlength="19" oninput="formatCard(this)"/>
-        <div class="card-icons">
-          <span>💳</span>
-        </div>
-      </div>
-    </div>
-    <div class="card-row fg">
-      <div>
-        <label class="fl" for="cardExpiry">Expiry</label>
-        <input type="text" id="cardExpiry" placeholder="MM / YY" maxlength="7" oninput="formatExpiry(this)"/>
-      </div>
-      <div>
-        <label class="fl" for="cardCvc">CVC</label>
-        <input type="number" id="cardCvc" placeholder="123" maxlength="4"/>
-      </div>
-    </div>
-  </div>
+
 
   <div class="summary-card">
     <h3>Order summary</h3>
@@ -384,43 +344,12 @@
     el.value = v.replace(/(.{4})/g,'$1 ').trim();
   }
 
-  // Expiry formatter
-  function formatExpiry(el) {
-    let v = el.value.replace(/\D/g,'').substring(0,4);
-    if (v.length >= 3) v = v.substring(0,2) + ' / ' + v.substring(2);
-    el.value = v;
-  }
-
-  const STRIPE_55  = 'https://buy.stripe.com/8x200j3zQa2NckZ3f1es001';
-  const STRIPE_100 = 'https://buy.stripe.com/28EdR90nE4It2Kpg1Nes002';
-
-  // Mother's Day date detection
-  function isMothersDay(dateStr) {
-    if (!dateStr) return false;
-    const d = new Date(dateStr + 'T00:00:00');
-    return d.getMonth() === 4 && d.getDate() === 11; // May 11
-  }
-
-  // Update total when date changes
-  document.getElementById('deliveryDate').addEventListener('change', function() {
-    const box = document.getElementById('summaryTotal');
-    const notice = document.getElementById('mdNotice');
-    if (isMothersDay(this.value)) {
-      box.textContent = '$100';
-      notice.style.display = 'block';
-    } else {
-      box.textContent = '$55';
-      notice.style.display = 'none';
-    }
-  });
-
   function submitOrder() {
     const required = [
       'senderName','senderPhone',
       'recipientName','recipientAddress',
       'deliveryDate','deliveryTime',
-      'cardMessage',
-      'cardName','cardNumber','cardExpiry','cardCvc'
+      'cardMessage'
     ];
     const missing = required.find(id => !document.getElementById(id).value.trim());
     if (missing) {
@@ -430,9 +359,34 @@
       setTimeout(() => el.style.borderColor = '', 2000);
       return;
     }
+
     const date = document.getElementById('deliveryDate').value;
-    const stripeLink = isMothersDay(date) ? STRIPE_100 : STRIPE_55;
-    window.location.href = stripeLink;
+
+    // Collect all form data
+    const formData = {
+      '🌸 From':            document.getElementById('senderName').value,
+      '📞 Sender Phone':    document.getElementById('senderPhone').value,
+      '💐 To':              document.getElementById('recipientName').value,
+      '📱 Recipient Phone': document.getElementById('recipientPhone').value,
+      '📍 Address':         document.getElementById('recipientAddress').value,
+      '📅 Date':            date,
+      '🕐 Time':            document.getElementById('deliveryTime').value,
+      '💌 Card Message':    document.getElementById('cardMessage').value,
+      '💰 Total Charged':   '$55',
+    };
+
+    // Send to Formspree then redirect to Stripe
+    fetch('https://formspree.io/f/xwvwyaep', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+      body: JSON.stringify(formData)
+    })
+    .then(() => {
+      window.location.href = 'https://buy.stripe.com/8x200j3zQa2NckZ3f1es001';
+    })
+    .catch(() => {
+      window.location.href = 'https://buy.stripe.com/8x200j3zQa2NckZ3f1es001';
+    });
   }
 </script>
 </body>
